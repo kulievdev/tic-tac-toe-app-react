@@ -31,23 +31,22 @@ function calculateWinner(board) {
     return null;
 }
 
-const isBoardFull = (currentBoard) => {
+function isBoardFull(currentBoard) {
     return currentBoard.every((cell) => cell !== null);
-};
+}
 
 function Board() {
     const [board, setBoard] = useState(Array(9).fill(null));
-    const [currentPlayer, setCurrentPlayer] = useState("X");
+    const [isX, setIsX] = useState(true);
 
-    const handleClick = (i) => {
-        if (calculateWinner(board) || board[i]) return;
+    function handleClick(idx) {
+        if (calculateWinner(board) || board[idx]) return;
 
-        board[i] = currentPlayer ? "X" : "O";
+        board[idx] = isX ? "X" : "O";
 
         setBoard(board);
-
-        setCurrentPlayer(!currentPlayer);
-    };
+        setIsX(!isX);
+    }
 
     const winner = calculateWinner(board);
     let status;
@@ -57,34 +56,48 @@ function Board() {
     } else if (isBoardFull(board)) {
         status = "It's a tie!";
     } else {
-        status = "Next Player: " + (currentPlayer ? "X" : "O");
+        status = "Next Player: " + (isX ? "X" : "O");
     }
 
-    const handleRestart = () => {
-        setCurrentPlayer("X");
+    function handleRestart() {
+        setIsX(true);
         setBoard(Array(9).fill(null));
-    };
+    }
 
     return (
-        <div className="app">
+        <>
+            <div
+                className={`btn ${
+                    winner
+                        ? "winner_class"
+                        : isBoardFull(board)
+                        ? "tie_class"
+                        : "status"
+                }`}
+            >
+                {status}
+            </div>
             <div className="board">
                 {board.map((value, idx) => {
                     return (
-                        <Cell onclick={() => handleClick(idx)} value={value} />
+                        <Square
+                            key={idx}
+                            value={value}
+                            onClick={() => handleClick(idx)}
+                        />
                     );
                 })}
             </div>
-            <div className="status">{status}</div>
-            <button className="restart" onClick={handleRestart}>
+            <button onClick={handleRestart} className="btn restart">
                 Restart The Game!
             </button>
-        </div>
+        </>
     );
 }
 
-function Cell({ onclick, value }) {
+function Square({ onClick, value }) {
     return (
-        <button className="cell" onClick={onclick}>
+        <button className="square" onClick={onClick}>
             {value}
         </button>
     );
